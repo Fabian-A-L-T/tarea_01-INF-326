@@ -1,0 +1,26 @@
+services:
+  service_01:
+    build: .
+    ports:
+      - "5000:80"
+    volumes:
+      - .:/code
+    links:
+      - service_01_mongodb
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  service_01_mongodb:
+    image: mongo:5.0
+    volumes:
+      - service_01_mongodb_container:/data/db
+    logging:
+        driver: none
+
+volumes:
+  service_01_mongodb_container:
+
+networks:
+  default:
+    name: tarea_01
+    external: true
