@@ -14,13 +14,13 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
 
-class Player(BaseModel):
+class Driver(BaseModel):
     id: str | None = None
     name: str
-    age: int
-    number: int
+    country: str
+    team: str
     team_id: str | None = None
-    description: str = ""
+    podiums: int = ""
 
     def __init__(self, **kargs):
         if "_id" in kargs:
@@ -34,11 +34,11 @@ async def root():
     return {"Hello": "World"}
 
 
-@app.get("/players",
-         response_model=list[Player])
-def players_all(team_id: str | None = None):
+@app.get("/drivers",
+         response_model=list[Driver])
+def drivers_all(team_id: str | None = None):
     """Prueba"""
-    logging.info(f"Getting all players (team_id: {team_id})")
+    logging.info(f"Getting all drivers (team_id: {team_id})")
     filters = {}
 
     sleep(3)
@@ -46,34 +46,34 @@ def players_all(team_id: str | None = None):
     if team_id:
         filters["team_id"] = team_id
 
-    return [Player(**player) for player in mongodb_client.service_01.players.find(filters)]
+    return [Driver(**driver) for driver in mongodb_client.service_01.drivers.find(filters)]
 
 
-@app.get("/players/{player_id}")
-def players_get(player_id: str):
-    return Player(**mongodb_client.service_01.players.find_one({"_id": ObjectId(player_id)}))
+@app.get("/driver/{driver_id}")
+def drivers_get(driver_id: str):
+    return Driver(**mongodb_client.service_01.drivers.find_one({"_id": ObjectId(driver_id)}))
 
 
-@app.delete("/players/{player_id}")
-def players_delete(player_id: str):
-    mongodb_client.service_01.players.delete_one(
-        {"_id": ObjectId(player_id)}
+@app.delete("/driver/{driver_id}")
+def drivers_delete(driver_id: str):
+    mongodb_client.service_01.drivers.delete_one(
+        {"_id": ObjectId(driver_id)}
     )
     return "ok"
 
 
-@app.post("/players")
-def players_create(player: Player):
-    inserted_id = mongodb_client.service_01.players.insert_one(
-        player.dict()
+@app.post("/drivers")
+def drivers_create(driver: Driver):
+    inserted_id = mongodb_client.service_01.drivers.insert_one(
+        driver.dict()
     ).inserted_id
 
-    new_player = Player(
-        **mongodb_client.service_01.players.find_one(
+    new_driver = Driver(
+        **mongodb_client.service_01.drivers.find_one(
             {"_id": ObjectId(inserted_id)}
         )
     )
 
-    logging.info(f"✨ New player created: {new_player}")
+    logging.info(f"✨ New driver created: {new_driver}")
 
-    return new_player
+    return new_driver

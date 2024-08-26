@@ -1,0 +1,64 @@
+service_01 data
+{
+  "id": "001",
+  "name": "Max Verstappen",
+  "country": "Belgium",
+  "team": "Red Bull Racing",
+  "team_id": "001",
+  "podiums": "108"
+}
+{
+  "id": "002",
+  "name": "Lando Norris",
+  "country": "Reino Unido",
+  "team": "McLaren",
+  "team_id": "002",
+  "podiums": "22"
+}
+{
+  "id": "003",
+  "name": "Charles Leclerc",
+  "country": "Monaco",
+  "team": "Ferrari",
+  "team_id": "003",
+  "podiums": "37"
+}
+{
+  "id": "004",
+  "name": "Oscar Piastri",
+  "country": "Australia",
+  "team": "McLaren",
+  "team_id": "002",
+  "podiums": "6"
+}
+{
+  "id": "005",
+  "name": "Carlos Sainz",
+  "country": "Spain",
+  "team": "Ferrari",
+  "team_id": "003",
+  "podiums": "23"
+}
+
+service_02 data
+{
+  "id": "001",
+  "name": "Red Bull Racing",
+  "base": "Reino Unido",
+  "power_unit": "Honda RBPT",
+  "base_chassis": "RB20"
+}
+{
+  "id": "002",
+  "name": "McLaren",
+  "base": "Reino Unido",
+  "power_unit": "Mercedes",
+  "base_chassis": "MCL38"
+}
+{
+  "id": "003",
+  "name": "Ferrari",
+  "base": "Italia",
+  "power_unit": "Ferrari",
+  "base_chassis": "SF-24"
+}

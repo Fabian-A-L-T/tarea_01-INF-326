@@ -16,28 +16,27 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
 
-class Player(BaseModel):
+class Driver(BaseModel):
     id: str | None = None
     name: str
-    age: int
-    number: int
+    country: str
+    team: str
     team_id: str | None = None
-    description: str = ""
+    podiums: str = ""
 
 
 class Country(str, Enum):
-    chile = 'Chile'
-    portugal = 'Portugal'
-    españa = 'España'
-    francia = "Francia"
-
+    belgica = 'Belgica'
+    uk = 'Reino Unido'
+    italia = 'Italia'
 
 class Team(BaseModel):
     id: str | None = None
     name: str
-    country: Country
+    base: Country
 
-    description: str = ""
+    power_unit: str = ""
+    base_chassis: str = ""
 
     def __init__(self, **kargs):
         if "_id" in kargs:
@@ -50,8 +49,8 @@ async def root():
     return {"Hello": "World"}
 
 
-def get_players_of_a_team(team_id) -> list[Player]:
-        url = f"http://service_01:80/players?team_id={team_id}"
+def get_drivers_of_a_team(team_id) -> list[Driver]:
+        url = f"http://service_01:80/drivers?team_id={team_id}"
         logging.info(f"🌍 Request [GET] {url}")
 
         return requests.get(url).json()
@@ -62,10 +61,10 @@ def teams_all(expand: list[str] = Query(default=[])):
              for team in mongodb_client.service_02.teams.find({})]
 
     # n+1 problem...
-    if expand and 'players' in expand:
+    if expand and 'drivers' in expand:
         logging.warning("🚨 n+1 requests...")
         for i, team in enumerate(teams):
-            teams[i]["players"] = get_players_of_a_team(team['id'])
+            teams[i]["drivers"] = get_drivers_of_a_team(team['id'])
 
     return teams
 
@@ -76,8 +75,8 @@ def teams_get(team_id: str, expand: list[str] = Query(default=[])):
         **mongodb_client.service_02.teams.find_one({"_id": ObjectId(team_id)})
     ).dict()
 
-    if expand and 'players' in expand:
-        team["players"] = get_players_of_a_team(team_id)
+    if expand and 'drivers' in expand:
+        team["drivers"] = get_drivers_of_a_team(team_id)
 
     return team
 

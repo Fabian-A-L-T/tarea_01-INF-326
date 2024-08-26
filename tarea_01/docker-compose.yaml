@@ -1,0 +1,80 @@
+version: "3"
+
+services:
+  service_01:
+    build: ./service_01
+    ports:
+      - "5000:80"
+    volumes:
+      - ./service_01:/code
+    links:
+      - service_01_mongodb
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  service_01_mongodb:
+    image: mongo:5.0
+    volumes:
+      - service_01_mongodb_container:/data/db
+    logging:
+        driver: none
+  
+  service_02:
+    build: ./service_02
+    ports:
+      - "5001:80"
+    volumes:
+      - ./service_02:/code
+    links:
+      - service_02_mongodb
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  service_02_mongodb:
+    image: mongo:5.0
+    volumes:
+      - service_02_mongodb_container:/data/db
+    logging:
+        driver: none
+  
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ./loki/config/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    networks:
+      - tarea_01
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - tarea_01
+
+  promtail:
+    image:  grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./loki/config/promtail.yaml:/etc/promtail/docker-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/docker-config.yaml
+    depends_on:
+      - loki
+    networks:
+      - tarea_01
+
+volumes:
+  service_01_mongodb_container:
+  service_02_mongodb_container:
+
+networks:
+  tarea_01:
+    external: true
